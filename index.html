@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de códigos ELT 406 MHz — LATAM</title>
+<style>
+  :root{
+    --bg:#0B1118; --panel:#131C26; --panel2:#0F1822; --inset:#0A1017;
+    --line:#22303D; --line2:#2C3D4C;
+    --txt:#DCE6EF; --muted:#728698; --dim:#4D5E6E;
+    --amber:#FFB23E; --amber-d:#A8741F; --cyan:#56E0C9; --red:#FF6B5E; --green:#5BD49B;
+    --safran:#C264A8; --nac:#4FB0D6;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(255,178,62,.06), transparent 60%),
+      radial-gradient(900px 500px at 0% 110%, rgba(86,224,201,.05), transparent 55%),
+      var(--bg);
+    color:var(--txt); font-family:var(--sans); -webkit-font-smoothing:antialiased;
+    line-height:1.45; padding:26px 20px 60px;
+  }
+  .wrap{max-width:1240px;margin:0 auto}
+
+  header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;
+    flex-wrap:wrap;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+  .brandrow{display:flex;align-items:center;gap:14px}
+  .beacon{width:32px;height:32px;border-radius:50%;flex:0 0 auto;position:relative;
+    background:radial-gradient(circle at 50% 42%, var(--amber), #6e4a13 70%);
+    box-shadow:0 0 0 1px var(--amber-d),0 0 22px 2px rgba(255,178,62,.45)}
+  .beacon::after{content:"";position:absolute;inset:-7px;border-radius:50%;
+    border:1px solid rgba(255,178,62,.35);animation:ping 2.4s ease-out infinite}
+  @keyframes ping{0%{transform:scale(.7);opacity:.8}100%{transform:scale(1.7);opacity:0}}
+  h1{font-size:20px;letter-spacing:.03em;margin:0;font-weight:650}
+  .sub{font-size:12px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase;margin-top:3px}
+  .conn{display:flex;align-items:center;gap:14px}
+  .status{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--dim);flex:0 0 auto}
+  .dot.on{background:var(--green);box-shadow:0 0 8px rgba(91,212,155,.7)}
+  .dot.local{background:var(--amber);box-shadow:0 0 8px rgba(255,178,62,.6)}
+  .gear{background:var(--inset);border:1px solid var(--line2);color:var(--muted);width:34px;height:34px;
+    border-radius:8px;cursor:pointer;font-size:15px;transition:.15s}
+  .gear:hover{color:var(--amber);border-color:var(--amber)}
+
+  .modetabs{display:flex;gap:4px;margin-bottom:20px;background:var(--inset);border:1px solid var(--line);
+    border-radius:10px;padding:4px;width:fit-content}
+  .modetab{font-family:var(--sans);font-size:13px;letter-spacing:.03em;cursor:pointer;border:none;
+    background:transparent;color:var(--muted);padding:8px 20px;border-radius:7px;transition:.15s}
+  .modetab:hover{color:var(--txt)}
+  .modetab.active{background:rgba(255,178,62,.14);color:var(--amber)}
+
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:14px;padding:20px}
+  .card+.card{margin-top:18px}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--amber);margin:0 0 14px;display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:18px;height:1px;background:var(--amber-d)}
+
+  /* counters */
+  .counters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .counter{background:var(--inset);border:1px solid var(--line);border-radius:11px;padding:13px 18px;min-width:120px}
+  .counter .n{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--txt);line-height:1}
+  .counter .l{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:6px}
+  .counter.safran .n{color:var(--safran)} .counter.nac .n{color:var(--nac)}
+
+  /* filter bar */
+  .filterbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  input[type=text],input[type=number],select,textarea{
+    background:var(--inset);border:1px solid var(--line2);color:var(--txt);font-family:var(--mono);
+    font-size:13.5px;padding:9px 11px;border-radius:8px;outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(255,178,62,.14)}
+  .search{flex:1;min-width:180px}
+  select{appearance:none;cursor:pointer;padding-right:30px;
+    background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+    background-position:calc(100% - 16px) center,calc(100% - 11px) center;background-size:5px 5px;background-repeat:no-repeat}
+
+  table.reg{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.reg th{text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+  table.reg td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.reg tr:hover td{background:rgba(255,255,255,.02)}
+  table.reg .hex{font-family:var(--mono);color:var(--cyan);letter-spacing:.04em;white-space:nowrap}
+  table.reg .mat{font-family:var(--mono);color:var(--txt)}
+  .pill{display:inline-block;font-size:10.5px;font-family:var(--mono);padding:2px 9px;border-radius:20px;letter-spacing:.03em}
+  .pill.safran{background:rgba(194,100,168,.16);color:var(--safran);border:1px solid rgba(194,100,168,.4)}
+  .pill.nac{background:rgba(79,176,214,.14);color:var(--nac);border:1px solid rgba(79,176,214,.4)}
+  .rowbtn{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:3px 6px;border-radius:6px}
+  .rowbtn:hover{color:var(--red);background:rgba(255,107,94,.1)}
+  .empty{text-align:center;color:var(--dim);padding:30px;font-size:13px}
+
+  /* form */
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px;align-items:start}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr}}
+  .fld{margin-bottom:15px}
+  label.lbl{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .fld input,.fld select,.fld textarea{width:100%}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hint{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.5}
+  .errmsg{font-size:11px;color:var(--red);margin-top:5px;min-height:0}
+  .err{border-color:var(--red)!important}
+  .badge{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:5px;background:var(--inset);border:1px solid var(--line2);color:var(--muted)}
+
+  .plate{background:var(--inset);border:1px solid var(--line2);border-radius:12px;padding:18px}
+  .plate-lab{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .hexid{font-family:var(--mono);font-size:clamp(20px,3.6vw,28px);font-weight:600;letter-spacing:.05em;
+    color:var(--cyan);word-break:break-all;text-shadow:0 0 16px rgba(86,224,201,.3)}
+  .plate-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .plate-meta b{color:var(--txt)}
+
+  button.act{font-family:var(--sans);font-size:13px;letter-spacing:.03em;cursor:pointer;background:var(--inset);
+    border:1px solid var(--line2);color:var(--txt);padding:10px 18px;border-radius:8px;transition:.15s}
+  button.act:hover{border-color:var(--amber);color:var(--amber)}
+  button.act.prime{background:rgba(255,178,62,.13);border-color:var(--amber-d);color:var(--amber)}
+  button.act:disabled{opacity:.4;cursor:not-allowed}
+  button.act:active{transform:translateY(1px)}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+
+  .note{font-size:11.5px;color:var(--dim);line-height:1.6;margin-top:14px;border-left:2px solid var(--line2);padding-left:12px}
+  .note b{color:var(--muted)}
+
+  /* modal settings */
+  .overlay{position:fixed;inset:0;background:rgba(5,9,13,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .overlay.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:24px;max-width:520px;width:100%}
+  .modal h3{margin:0 0 4px;font-size:16px}
+  .modal p{font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.5}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel);
+    border:1px solid var(--amber-d);color:var(--amber);font-family:var(--mono);font-size:12.5px;padding:10px 18px;
+    border-radius:9px;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.ok{border-color:var(--green);color:var(--green)}
+  .toast.bad{border-color:var(--red);color:var(--red)}
+  @media(prefers-reduced-motion:reduce){.beacon::after{animation:none}.toast{transition:none}}
+
+  .disclaimer{margin-top:26px;font-size:11px;color:var(--dim);line-height:1.65;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brandrow">
+      <div class="beacon" aria-hidden="true"></div>
+      <div>
+        <h1>Registro de códigos ELT&nbsp;406&nbsp;MHz</h1>
+        <div class="sub">Cospas-Sarsat · Protocolo RLS Location</div>
+      </div>
+    </div>
+    <div class="conn">
+      <div class="status"><span class="dot" id="connDot"></span><span id="connTxt">Modo local</span></div>
+      <button class="gear" id="openCfg" title="Configurar Google Sheets">⚙</button>
+    </div>
+  </header>
+
+  <div class="modetabs">
+    <button class="modetab active" id="tabReg">Registro</button>
+    <button class="modetab" id="tabNew">Asignar código</button>
+    <button class="modetab" id="tabVer">Verificar</button>
+  </div>
+
+  <!-- ===================== REGISTRO ===================== -->
+  <div id="viewReg">
+    <div class="counters">
+      <div class="counter"><div class="n" id="cTotal">0</div><div class="l">Total</div></div>
+      <div class="counter safran"><div class="n" id="cSafran">0</div><div class="l">SAFRAN (TAC 2350)</div></div>
+      <div class="counter nac"><div class="n" id="cNac">0</div><div class="l">Nacional (NRN 2920)</div></div>
+    </div>
+    <div class="card">
+      <div class="filterbar">
+        <input type="text" class="search" id="search" placeholder="Buscar matrícula, código, operador…">
+        <select id="fFuente">
+          <option value="">Todas las fuentes</option>
+          <option value="SAFRAN">SAFRAN</option>
+          <option value="NACIONAL">Nacional / DGAC</option>
+        </select>
+        <button class="act" id="syncBtn">Sincronizar</button>
+        <button class="act" id="csvBtn">Exportar CSV</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="reg">
+          <thead><tr>
+            <th>Sec.</th><th>Código 15-Hex</th><th>Matrícula</th><th>Operador</th>
+            <th>Modelo</th><th>Nº / Serie</th><th>Fuente</th><th></th>
+          </tr></thead>
+          <tbody id="regBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ASIGNAR ===================== -->
+  <div id="viewNew" style="display:none">
+    <div class="grid2">
+      <div class="card">
+        <p class="eyebrow">Datos de la asignación</p>
+        <div class="fld">
+          <label class="lbl" for="perfil">Perfil de codificación</label>
+          <select id="perfil">
+            <option value="NACIONAL" selected>Nacional / DGAC — NRN 2920 (asignado por nosotros)</option>
+            <option value="SAFRAN">SAFRAN — TAC 2350 (asignado por el fabricante)</option>
+            <option value="CUSTOM">Personalizado…</option>
+          </select>
+        </div>
+        <div class="two" id="customWrap" style="display:none">
+          <div class="fld">
+            <label class="lbl" for="cFuente">Tipo de número</label>
+            <select id="cFuente"><option value="NRN">RLS Nacional</option><option value="TAC">TAC C/S</option></select>
+          </div>
+          <div class="fld">
+            <label class="lbl" for="cNumero">Número</label>
+            <input type="text" id="cNumero" value="2920" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="fld">
+            <label class="lbl" for="mat">Matrícula</label>
+            <input type="text" id="mat" placeholder="CC-BHX" style="text-transform:uppercase">
+            <div class="errmsg" id="matErr"></div>
+          </div>
+          <div class="fld">
+            <label class="lbl" for="oper">Operador</label>
+            <input type="text" id="oper" value="LATAM">
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="fld">
+            <label class="lbl" for="modelo">Modelo de baliza</label>
+            <input type="text" id="modelo" value="Kannad Ultima S-4">
+          </div>
+          <div class="fld">
+            <label class="lbl" for="serie">Nº de serie <span class="badge">1–16383</span></label>
+            <input type="text" id="serie" inputmode="numeric">
+            <div class="errmsg" id="serErr"></div>
+          </div>
+        </div>
+        <div class="hint" id="serieHint"></div>
+
+        <div class="fld">
+          <label class="lbl" for="notas">Notas (opcional)</label>
+          <input type="text" id="notas" placeholder="Nº parte, observaciones…">
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <p class="eyebrow">Código generado</p>
+          <div class="plate">
+            <div class="plate-lab">15-Hex ID</div>
+            <div class="hexid" id="newHex">—</div>
+            <div class="plate-meta">
+              <span id="mProto">RLS Location</span>
+              <span id="mNum">—</span>
+              <span id="mSer">—</span>
+            </div>
+          </div>
+          <div class="btnrow">
+            <button class="act prime" id="saveBtn">Guardar en registro</button>
+            <button class="act" id="copyNew">Copiar</button>
+          </div>
+          <div class="note">El código se calcula con el motor verificado contra el Anexo&nbsp;B de C/S&nbsp;T.001. Se valida que no exista ya esa matrícula ni ese código antes de guardar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== VERIFICAR ===================== -->
+  <div id="viewVer" style="display:none">
+    <div class="card">
+      <p class="eyebrow">Verificar / decodificar</p>
+      <div class="fld" style="max-width:420px">
+        <label class="lbl" for="verIn">15-Hex ID</label>
+        <input type="text" id="verIn" placeholder="5ABA730000BFDFF" spellcheck="false">
+        <div class="errmsg" id="verErr"></div>
+      </div>
+      <button class="act prime" id="verGo">Decodificar</button>
+      <dl class="refgrid" id="verOut" style="margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:7px 18px;font-size:13px"></dl>
+    </div>
+  </div>
+
+  <p class="disclaimer">
+    Sistema de gestión de códigos de baliza 406&nbsp;MHz. La codificación sigue el Protocolo RLS Location de Cospas-Sarsat C/S&nbsp;T.001 (Issue&nbsp;4, Rev.&nbsp;12), con BCH-1/BCH-2 verificados contra el Anexo&nbsp;B. Persistencia opcional en Google&nbsp;Sheets. Todo código que se programe en una baliza debe validarse con el fabricante y la autoridad aeronáutica antes de su uso operacional.
+  </p>
+</div>
+
+<!-- settings modal -->
+<div class="overlay" id="cfgOverlay">
+  <div class="modal">
+    <h3>Conexión con Google Sheets</h3>
+    <p>Pega la URL del Web App de Google Apps Script y el token. Si lo dejas vacío, la app funciona en modo local (este navegador).</p>
+    <div class="fld"><label class="lbl" for="cfgUrl">URL del Web App (termina en /exec)</label><input type="text" id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
+    <div class="fld"><label class="lbl" for="cfgToken">Token</label><input type="text" id="cfgToken" placeholder="el mismo TOKEN del Code.gs"></div>
+    <div class="btnrow">
+      <button class="act prime" id="cfgSave">Guardar y conectar</button>
+      <button class="act" id="cfgClose">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   MOTOR DE CODIFICACIÓN — C/S T.001 (RLS Location)
+   BCH-1 y BCH-2 verificados contra el Anexo B.
+   ============================================================ */
+const toBits=s=>Array.prototype.map.call(s,c=>+c), fromBits=a=>a.join('');
+const dec2bin=(v,w)=>(v>>>0).toString(2).padStart(w,'0');
+function mod2rem(d,g){const r=d.slice(),L=g.length;for(let i=0;i<=r.length-L;i++)if(r[i]===1)for(let j=0;j<L;j++)r[i+j]^=g[j];return r.slice(r.length-(L-1));}
+const G1=toBits('1001101101100111100011'), G2=toBits('1010100111001');
+const bch1=p=>fromBits(mod2rem(toBits(p).concat(Array(21).fill(0)),G1));
+const bch2=p=>fromBits(mod2rem(toBits(p).concat(Array(12).fill(0)),G2));
+const bin2hex=s=>{let o='';for(let i=0;i<s.length;i+=4)o+=parseInt(s.substr(i,4),2).toString(16).toUpperCase();return o;};
+const hex2bin=h=>{let b='';for(const c of h)b+=parseInt(c,16).toString(2).padStart(4,'0');return b;};
+const POS_DEFAULT='0'+'1'.repeat(8)+'0'+'1'.repeat(9);
+const BT={ELT:'00',EPIRB:'01',PLB:'10'};
+
+function encode15({country=725,btype='ELT',numero,serie}){
+  const trunc=(+numero)%1000;
+  const pdf1='1'+'0'+dec2bin(country,10)+'1101'+BT[btype]+dec2bin(trunc,10)+dec2bin(+serie,14)+POS_DEFAULT;
+  return bin2hex(pdf1.slice(1));               // 60 bits -> 15 hex
+}
+const groupHex = h => h.replace(/(.{7})(.{4})(.{4})/,'$1 $2 $3');
+
+function decode15(hex){
+  const raw=hex.replace(/[\s\-]/g,'').toUpperCase();
+  if(!/^[0-9A-F]+$/.test(raw)) return {error:'Solo hexadecimal'};
+  if(raw.length!==15 && raw.length!==30) return {error:'Debe tener 15 o 30 caracteres'};
+  const id=raw.length===30?hex2bin(raw).slice(1,61):hex2bin(raw);
+  const cc=parseInt(id.slice(1,11),2), pc=id.slice(11,15), bt=id.slice(15,17);
+  const proto={'1101':'RLS Location','1001':'ELT(DT) Location'}[pc]||('código '+pc);
+  const o={pais:cc, protocolo:proto};
+  if(pc==='1101'){
+    const tipo={'00':'ELT','01':'EPIRB','10':'PLB','11':'Test'}[bt];
+    const tacd=parseInt(id.slice(17,27),2), ser=parseInt(id.slice(27,41),2);
+    const series={ELT:2000,EPIRB:1000,PLB:3000}[tipo], full=series+tacd, esNRN=tacd>=920&&tacd<=948;
+    o.tipo=tipo; o.numero=full; o.fuente=esNRN?'RLS Nacional':'TAC C/S'; o.serie=ser;
+    const pos=id.slice(41,60), def='0'+'1'.repeat(8)+'0'+'1'.repeat(9);
+    o.posicion = (pos===def||pos==='1'.repeat(19))?'por defecto':
+      (parseInt(pos.slice(1,9),2)/2)+'° '+(pos[0]==='1'?'S':'N')+', '+(parseInt(pos.slice(10,19),2)/2)+'° '+(pos[9]==='1'?'W':'E');
+  } else if(pc==='1001'){
+    o.tipoIdent={'00':'Dir. 24-bit','01':'Operador+serie','10':'TAC+serie','11':'Reservado'}[bt];
+  }
+  return o;
+}
+
+/* ============================================================
+   PERFILES
+   ============================================================ */
+const PERFILES = {
+  NACIONAL:{label:'Nacional / DGAC', fuente:'NRN', numero:2920},
+  SAFRAN:  {label:'SAFRAN',          fuente:'TAC', numero:2350},
+};
+function perfilDe(fuente,numero){
+  // deduce nombre de perfil a partir de fuente/numero para mostrar pill
+  if(+numero===2920) return 'NACIONAL';
+  if(+numero===2350) return 'SAFRAN';
+  return 'NACIONAL';
+}
+
+/* ============================================================
+   DATOS PRECARGADOS (planilla de control)
+   ============================================================ */
+const SEED = [
+  ['0001','CC-BHJ','LATAM','Kannad Ultima S-4','SAFRAN',2350,1],
+  ['0010','CC-BHL','LATAM','Kannad Ultima S-4','SAFRAN',2350,10],
+  ['0011','CC-BHK','LATAM','Kannad Ultima S-4','SAFRAN',2350,11],
+  ['0003','CC-BHM','LATAM','Kannad Ultima S-4','SAFRAN',2350,3],
+  ['0018','CC-BHU','LATAM','Kannad Ultima S-4','SAFRAN',2350,18],
+  ['0001','CC-BHN','LATAM','Kannad Ultima S-4','NACIONAL',2920,1],
+  ['0002','CC-BHS','LATAM','Kannad Ultima S-4','NACIONAL',2920,2],
+  ['0003','CC-BHT','LATAM','Kannad Ultima S-4','NACIONAL',2920,3],
+  ['0004','CC-BHU','LATAM','Kannad Ultima S-4','NACIONAL',2920,4],
+  ['0005','CC-BHZ','LATAM','Kannad Ultima S-4','NACIONAL',2920,5],
+  ['0006','','LATAM','Kannad Ultima S-4','NACIONAL',2920,6],
+  ['0007','','LATAM','Kannad Ultima S-4','NACIONAL',2920,7],
+].map((r,i)=>({
+  id:'seed-'+(i+1), secuencial:r[0], matricula:r[1], operador:r[2], modelo:r[3],
+  equipo_tipo:'S / RLS', fuente:r[4], numero:r[5], serie:r[6],
+  codigo_hex:encode15({numero:r[5],serie:r[6]}), fecha:'', notas:''
+}));
+
+/* ============================================================
+   ESTADO + PERSISTENCIA
+   ============================================================ */
+const LS_DATA='elt_registro_v1', LS_CFG='elt_cfg_v1';
+const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let state={rows:[], cfg:{url:'',token:''}};
+
+function loadCfg(){ try{state.cfg=JSON.parse(safeGet(LS_CFG))||state.cfg}catch(e){} }
+function saveCfg(){ safeSet(LS_CFG, JSON.stringify(state.cfg)); }
+function loadLocal(){ try{const d=JSON.parse(safeGet(LS_DATA)); state.rows = (d&&d.length)?d:SEED.slice();}catch(e){state.rows=SEED.slice();} }
+function saveLocal(){ safeSet(LS_DATA, JSON.stringify(state.rows)); }
+
+const api = {
+  connected:()=>!!state.cfg.url,
+  async list(){
+    if(!api.connected()) return null;
+    const r=await fetch(state.cfg.url+'?action=list',{method:'GET'});
+    const j=await r.json(); if(!j.ok) throw new Error(j.error); return j.rows;
+  },
+  async post(payload){
+    if(!api.connected()) return null;
+    const r=await fetch(state.cfg.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(Object.assign({token:state.cfg.token},payload))});
+    const j=await r.json(); if(!j.ok) throw new Error(j.error); return j.rows;
+  }
+};
+
+function normalizeRow(o){ // asegura tipos desde Sheets (todo llega como string)
+  return Object.assign({},o,{numero:+o.numero, serie:+o.serie});
+}
+
+async function refresh(showToast){
+  setConn();
+  if(api.connected()){
+    try{
+      const rows=await api.list();
+      if(rows){ state.rows = rows.length?rows.map(normalizeRow):SEED.slice(); saveLocal(); }
+      if(showToast) toast('Sincronizado con Google Sheets','ok');
+    }catch(e){ toast('Error de conexión: '+e.message,'bad'); }
+  } else if(showToast){ toast('Modo local (sin Google Sheets)'); }
+  renderReg(); renderNew();
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+const $=id=>document.getElementById(id);
+function toast(msg,kind){const t=$('toast');t.className='toast show'+(kind?' '+kind:'');t.textContent=msg;setTimeout(()=>t.className='toast',1800);}
+function setConn(){
+  const dot=$('connDot'),txt=$('connTxt');
+  if(api.connected()){dot.className='dot on';txt.textContent='Google Sheets';}
+  else{dot.className='dot local';txt.textContent='Modo local';}
+}
+
+/* ---- tabs ---- */
+function show(view){
+  $('viewReg').style.display=view==='reg'?'':'none';
+  $('viewNew').style.display=view==='new'?'':'none';
+  $('viewVer').style.display=view==='ver'?'':'none';
+  $('tabReg').classList.toggle('active',view==='reg');
+  $('tabNew').classList.toggle('active',view==='new');
+  $('tabVer').classList.toggle('active',view==='ver');
+}
+$('tabReg').onclick=()=>show('reg'); $('tabNew').onclick=()=>{show('new');renderNew();}; $('tabVer').onclick=()=>show('ver');
+
+/* ---- registro ---- */
+function renderReg(){
+  const q=($('search').value||'').toLowerCase().trim();
+  const ff=$('fFuente').value;
+  const rows=state.rows.filter(r=>{
+    if(ff && r.fuente!==ff) return false;
+    if(!q) return true;
+    return [r.matricula,r.codigo_hex,r.operador,r.modelo].join(' ').toLowerCase().includes(q);
+  });
+  $('cTotal').textContent=state.rows.length;
+  $('cSafran').textContent=state.rows.filter(r=>r.fuente==='SAFRAN').length;
+  $('cNac').textContent=state.rows.filter(r=>r.fuente==='NACIONAL').length;
+
+  const tb=$('regBody'); tb.innerHTML='';
+  if(!rows.length){ tb.innerHTML='<tr><td colspan="8" class="empty">Sin resultados</td></tr>'; return; }
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    const pillCls=r.fuente==='SAFRAN'?'safran':'nac';
+    const pillTxt=r.fuente==='SAFRAN'?'SAFRAN':'Nacional';
+    tr.innerHTML=
+      `<td class="mono" style="color:var(--muted)">${r.secuencial||''}</td>`+
+      `<td class="hex">${groupHex(r.codigo_hex)}</td>`+
+      `<td class="mat">${r.matricula||'<span style="color:var(--dim)">—</span>'}</td>`+
+      `<td>${r.operador||''}</td>`+
+      `<td style="color:var(--muted)">${r.modelo||''}</td>`+
+      `<td class="mono" style="color:var(--muted)">${r.numero} · S${r.serie}</td>`+
+      `<td><span class="pill ${pillCls}">${pillTxt}</span></td>`+
+      `<td><button class="rowbtn" title="Eliminar" data-id="${r.id}">✕</button></td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('.rowbtn').forEach(b=>b.onclick=()=>delRow(b.dataset.id));
+}
+['input','change'].forEach(e=>{$('search').addEventListener(e,renderReg);$('fFuente').addEventListener(e,renderReg);});
+$('syncBtn').onclick=()=>refresh(true);
+$('csvBtn').onclick=()=>{
+  const head=['secuencial','codigo_hex','matricula','operador','modelo','fuente','numero','serie','notas'];
+  const lines=[head.join(',')].concat(state.rows.map(r=>head.map(h=>`"${(r[h]??'')}"`).join(',')));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='registro_elt.csv';a.click();
+};
+
+async function delRow(id){
+  if(!confirm('¿Eliminar este código del registro?')) return;
+  if(api.connected()){ try{const rows=await api.post({action:'delete',id}); if(rows){state.rows=rows.map(normalizeRow);} }catch(e){toast(e.message,'bad');return;} }
+  else state.rows=state.rows.filter(r=>r.id!==id);
+  saveLocal(); renderReg(); renderNew(); toast('Código eliminado');
+}
+
+/* ---- asignar ---- */
+function currentProfile(){
+  const k=$('perfil').value;
+  if(k==='CUSTOM') return {fuente:$('cFuente').value, numero:+($('cNumero').value||0), key:'NACIONAL'};
+  return Object.assign({key:k}, PERFILES[k]);
+}
+function nextSerial(key){
+  const used=state.rows.filter(r=>r.fuente===key).map(r=>+r.serie);
+  let n=1; while(used.includes(n)) n++; return n;
+}
+function renderNew(){
+  $('customWrap').style.display = $('perfil').value==='CUSTOM'?'grid':'none';
+  const p=currentProfile();
+  // sugerir serie si vacío
+  if(!$('serie').value || $('serie').dataset.auto==='1'){
+    $('serie').value=nextSerial(p.key); $('serie').dataset.auto='1';
+  }
+  $('serieHint').innerHTML=`Siguiente serie libre para <b>${PERFILES[p.key]?.label||'este perfil'}</b>: ${nextSerial(p.key)}`;
+
+  const serie=parseInt($('serie').value,10);
+  let serErr=''; if(isNaN(serie)||serie<1||serie>16383) serErr='Serie válida: 1–16383.';
+  $('serErr').textContent=serErr; $('serie').classList.toggle('err',!!serErr);
+
+  let numErr = (!p.numero || isNaN(p.numero));
+  if(serErr || numErr){ $('newHex').textContent='—'; $('mNum').textContent='—'; $('mSer').textContent='—'; $('saveBtn').disabled=true; return; }
+
+  const hex=encode15({numero:p.numero,serie});
+  $('newHex').textContent=groupHex(hex);
+  $('mNum').innerHTML=(p.fuente==='NRN'?'NRN ':'TAC ')+'<b>'+p.numero+'</b>';
+  $('mSer').innerHTML='Serie <b>'+serie+'</b>';
+
+  // validar matrícula y duplicados
+  const mat=($('mat').value||'').toUpperCase().trim();
+  let matErr='';
+  if(mat && state.rows.some(r=>(r.matricula||'').toUpperCase()===mat)) matErr='Esa matrícula ya está en el registro.';
+  if(state.rows.some(r=>r.codigo_hex===hex)) matErr=matErr||'Ese código 15-Hex ya existe (misma fuente y serie).';
+  $('matErr').textContent=matErr; $('mat').classList.toggle('err',!!matErr);
+  $('saveBtn').disabled = !!matErr;
+}
+['perfil','cFuente','cNumero','mat','oper','modelo','notas'].forEach(id=>['input','change'].forEach(e=>$(id).addEventListener(e,renderNew)));
+$('serie').addEventListener('input',()=>{$('serie').dataset.auto='0';renderNew();});
+
+$('copyNew').onclick=()=>{const t=$('newHex').textContent.replace(/\s/g,'');if(t&&t!=='—')navigator.clipboard?.writeText(t).then(()=>toast('Código copiado','ok'));};
+
+$('saveBtn').onclick=async()=>{
+  const p=currentProfile(); const serie=parseInt($('serie').value,10);
+  const hex=encode15({numero:p.numero,serie});
+  const row={
+    id:(crypto?.randomUUID?.()||'r'+Date.now()),
+    secuencial:String(nextSeqFor(p.key)).padStart(4,'0'),
+    codigo_hex:hex, operador:$('oper').value.trim(), matricula:($('mat').value||'').toUpperCase().trim(),
+    modelo:$('modelo').value.trim(), equipo_tipo:'S / RLS', fuente:p.key, numero:p.numero, serie,
+    fecha:new Date().toISOString().slice(0,10), notas:$('notas').value.trim()
+  };
+  if(api.connected()){
+    try{const rows=await api.post({action:'add',row}); if(rows) state.rows=rows.map(normalizeRow);}
+    catch(e){toast('No se pudo guardar: '+e.message,'bad');return;}
+  } else { state.rows.push(row); }
+  saveLocal(); toast('Código guardado: '+groupHex(hex),'ok');
+  $('mat').value=''; $('serie').dataset.auto='1'; $('notas').value='';
+  renderReg(); renderNew(); show('reg');
+};
+function nextSeqFor(key){
+  const seqs=state.rows.filter(r=>r.fuente===key).map(r=>parseInt(r.secuencial,10)).filter(n=>!isNaN(n));
+  return (seqs.length?Math.max(...seqs):0)+1;
+}
+
+/* ---- verificar ---- */
+$('verGo').onclick=()=>{
+  const o=decode15($('verIn').value);
+  const out=$('verOut'); $('verErr').textContent='';
+  if(o.error){ $('verErr').textContent=o.error; out.innerHTML=''; return; }
+  const map=[['País (MID)',o.pais+(o.pais===725?' — Chile':'')],['Protocolo',o.protocolo]];
+  if(o.tipo) map.push(['Tipo',o.tipo],[o.fuente,o.numero],['Serie',o.serie],['Posición',o.posicion]);
+  if(o.tipoIdent) map.push(['Tipo de identidad',o.tipoIdent]);
+  // ¿coincide con algún registro?
+  const raw=$('verIn').value.replace(/[\s\-]/g,'').toUpperCase();
+  const hit=state.rows.find(r=>r.codigo_hex===raw.slice(0,15));
+  if(hit) map.push(['En registro','✔ '+(hit.matricula||'(sin matrícula)')]);
+  out.innerHTML=map.map(([k,v])=>`<dt style="color:var(--muted)">${k}</dt><dd style="margin:0;font-family:var(--mono)">${v}</dd>`).join('');
+};
+$('verIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('verGo').click();});
+
+/* ---- settings ---- */
+$('openCfg').onclick=()=>{$('cfgUrl').value=state.cfg.url;$('cfgToken').value=state.cfg.token;$('cfgOverlay').classList.add('show');};
+$('cfgClose').onclick=()=>$('cfgOverlay').classList.remove('show');
+$('cfgSave').onclick=async()=>{
+  state.cfg.url=$('cfgUrl').value.trim().replace(/\?.*$/,''); state.cfg.token=$('cfgToken').value.trim();
+  saveCfg(); $('cfgOverlay').classList.remove('show'); await refresh(true);
+};
+
+/* ---- init ---- */
+loadCfg(); loadLocal(); setConn(); renderReg(); renderNew();
+refresh(false);
+</script>
+</body>
+</html>
