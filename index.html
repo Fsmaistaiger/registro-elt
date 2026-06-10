@@ -280,9 +280,22 @@
         <div class="errmsg" id="verErr"></div>
       </div>
       <button class="act prime" id="verGo">Decodificar</button>
-      <dl class="refgrid" id="verOut" style="margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:7px 18px;font-size:13px"></dl>
+      <button class="act" id="verExt" title="Copia el código y abre el decoder oficial Cospas-Sarsat">Verificar en decoder oficial ↗</button>
+      <div id="verStatus" style="margin-top:18px"></div>
+      <dl class="refgrid" id="verOut" style="margin-top:14px;display:grid;grid-template-columns:auto 1fr;gap:7px 18px;font-size:13px"></dl>
     </div>
   </div>
+  <style>
+    .vbadge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;font-weight:600;
+      padding:7px 14px;border-radius:9px;letter-spacing:.04em}
+    .vbadge.ok{background:rgba(91,212,155,.14);border:1px solid var(--green);color:var(--green)}
+    .vbadge.bad{background:rgba(255,107,94,.12);border:1px solid var(--red);color:var(--red)}
+    .vchecks{list-style:none;padding:0;margin:12px 0 0;font-size:12.5px}
+    .vchecks li{display:flex;gap:9px;padding:4px 0;color:var(--muted)}
+    .vchecks .ic{flex:0 0 auto;font-family:var(--mono);font-weight:700}
+    .vchecks .ic.ok{color:var(--green)} .vchecks .ic.bad{color:var(--red)} .vchecks .ic.na{color:var(--dim)}
+    .vchecks b{color:var(--txt);font-weight:600;font-family:var(--mono)}
+  </style>
 
   <p class="disclaimer">
     Sistema de gestión de códigos de baliza 406&nbsp;MHz. La codificación sigue el Protocolo RLS Location de Cospas-Sarsat C/S&nbsp;T.001 (Issue&nbsp;4, Rev.&nbsp;12), con BCH-1/BCH-2 verificados contra el Anexo&nbsp;B. Persistencia opcional en Google&nbsp;Sheets. Todo código que se programe en una baliza debe validarse con el fabricante y la autoridad aeronáutica antes de su uso operacional.
@@ -392,9 +405,13 @@ const SEED = [
 const LS_DATA='elt_registro_v1', LS_CFG='elt_cfg_v1';
 const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
-let state={rows:[], cfg:{url:'',token:''}};
+const DEFAULT_CFG={
+  url:'https://script.google.com/macros/s/AKfycbyXAYF9U4nJbgh2znJvY79jvlI-YlecU-174-M5fUnSywikt5imuKDnrdH0FcWpu5PuEA/exec',
+  token:'DGAC-elt-2026'
+};
+let state={rows:[], cfg:Object.assign({},DEFAULT_CFG)};
 
-function loadCfg(){ try{state.cfg=JSON.parse(safeGet(LS_CFG))||state.cfg}catch(e){} }
+function loadCfg(){ try{const s=JSON.parse(safeGet(LS_CFG)); if(s&&s.url) state.cfg=s;}catch(e){} }
 function saveCfg(){ safeSet(LS_CFG, JSON.stringify(state.cfg)); }
 function loadLocal(){ try{const d=JSON.parse(safeGet(LS_DATA)); state.rows = (d&&d.length)?d:SEED.slice();}catch(e){state.rows=SEED.slice();} }
 function saveLocal(){ safeSet(LS_DATA, JSON.stringify(state.rows)); }
@@ -510,28 +527,27 @@ function nextSerial(key){
   const used=state.rows.filter(r=>r.fuente===key).map(r=>+r.serie);
   let n=1; while(used.includes(n)) n++; return n;
 }
+function suggestSerial(){ const p=currentProfile(); $('serie').value=nextSerial(p.key); renderNew(); }
 function renderNew(){
   $('customWrap').style.display = $('perfil').value==='CUSTOM'?'grid':'none';
   const p=currentProfile();
-  // sugerir serie si vacío
-  if(!$('serie').value || $('serie').dataset.auto==='1'){
-    $('serie').value=nextSerial(p.key); $('serie').dataset.auto='1';
-  }
   $('serieHint').innerHTML=`Siguiente serie libre para <b>${PERFILES[p.key]?.label||'este perfil'}</b>: ${nextSerial(p.key)}`;
 
-  const serie=parseInt($('serie').value,10);
-  let serErr=''; if(isNaN(serie)||serie<1||serie>16383) serErr='Serie válida: 1–16383.';
+  const txt=($('serie').value||'').trim();
+  const serie=parseInt(txt,10);
+  const serieOk = txt!=='' && !isNaN(serie) && serie>=1 && serie<=16383;
+  // solo marcar error si hay algo escrito que no sirve (permite borrar para reescribir)
+  let serErr = (txt!=='' && !serieOk) ? 'Serie válida: 1–16383.' : '';
   $('serErr').textContent=serErr; $('serie').classList.toggle('err',!!serErr);
 
-  let numErr = (!p.numero || isNaN(p.numero));
-  if(serErr || numErr){ $('newHex').textContent='—'; $('mNum').textContent='—'; $('mSer').textContent='—'; $('saveBtn').disabled=true; return; }
+  const numOk = p.numero && !isNaN(p.numero);
+  if(!serieOk || !numOk){ $('newHex').textContent='—'; $('mNum').textContent='—'; $('mSer').textContent='—'; $('saveBtn').disabled=true; return; }
 
   const hex=encode15({numero:p.numero,serie});
   $('newHex').textContent=groupHex(hex);
   $('mNum').innerHTML=(p.fuente==='NRN'?'NRN ':'TAC ')+'<b>'+p.numero+'</b>';
   $('mSer').innerHTML='Serie <b>'+serie+'</b>';
 
-  // validar matrícula y duplicados
   const mat=($('mat').value||'').toUpperCase().trim();
   let matErr='';
   if(mat && state.rows.some(r=>(r.matricula||'').toUpperCase()===mat)) matErr='Esa matrícula ya está en el registro.';
@@ -539,8 +555,9 @@ function renderNew(){
   $('matErr').textContent=matErr; $('mat').classList.toggle('err',!!matErr);
   $('saveBtn').disabled = !!matErr;
 }
-['perfil','cFuente','cNumero','mat','oper','modelo','notas'].forEach(id=>['input','change'].forEach(e=>$(id).addEventListener(e,renderNew)));
-$('serie').addEventListener('input',()=>{$('serie').dataset.auto='0';renderNew();});
+['mat','oper','modelo','notas','serie','cNumero'].forEach(id=>['input','change'].forEach(e=>$(id).addEventListener(e,renderNew)));
+$('perfil').addEventListener('change',suggestSerial);
+$('cFuente').addEventListener('change',suggestSerial);
 
 $('copyNew').onclick=()=>{const t=$('newHex').textContent.replace(/\s/g,'');if(t&&t!=='—')navigator.clipboard?.writeText(t).then(()=>toast('Código copiado','ok'));};
 
@@ -559,7 +576,7 @@ $('saveBtn').onclick=async()=>{
     catch(e){toast('No se pudo guardar: '+e.message,'bad');return;}
   } else { state.rows.push(row); }
   saveLocal(); toast('Código guardado: '+groupHex(hex),'ok');
-  $('mat').value=''; $('serie').dataset.auto='1'; $('notas').value='';
+  $('mat').value=''; $('notas').value=''; suggestSerial();
   renderReg(); renderNew(); show('reg');
 };
 function nextSeqFor(key){
@@ -568,20 +585,88 @@ function nextSeqFor(key){
 }
 
 /* ---- verificar ---- */
-$('verGo').onclick=()=>{
+/* ============================================================
+   VERIFICACIÓN INDEPENDIENTE (ruta separada del codificador)
+   - decodifica campos, recalcula BCH, comprueba coherencia
+   ============================================================ */
+function verifyCode(input){
+  const raw=(input||'').replace(/[\s\-]/g,'').toUpperCase();
+  const checks=[]; const add=(name,state,detail)=>checks.push({name,state,detail});
+  if(!/^[0-9A-F]+$/.test(raw)){ return {ok:false,fatal:'Solo caracteres hexadecimales (0–9, A–F).',checks}; }
+  if(raw.length!==15 && raw.length!==30){ return {ok:false,fatal:`Debe tener 15 (ID) o 30 (trama) caracteres. Tiene ${raw.length}.`,checks}; }
+
+  add('Longitud y caracteres', 'ok', `${raw.length} hex válidos`);
+  const bits = hex2bin(raw);
+  const id60 = raw.length===30 ? bits.slice(1,61) : bits;
+
+  // campos
+  const cc=parseInt(id60.slice(1,11),2), pc=id60.slice(11,15);
+  const protoOK = pc==='1101' || pc==='1001';
+  add('Protocolo reconocido', protoOK?'ok':'bad', pc + (pc==='1101'?' · RLS Location':pc==='1001'?' · ELT(DT) Location':' · no soportado'));
+  add('Código de país', cc>=0&&cc<=1023?'ok':'bad', cc + (cc===725?' · Chile':''));
+
+  // reconstrucción (round-trip): re-arma los 60 bits desde los campos decodificados
+  let rebuilt=null, rtState='na', rtDetail='solo aplica a RLS/ELT-DT 24-bit';
+  if(pc==='1101'){
+    const bt=id60.slice(15,17), tac=id60.slice(17,27), ser=id60.slice(27,41), pos=id60.slice(41,60);
+    rebuilt = id60[0]+id60.slice(1,11)+pc+bt+tac+ser+pos;        // misma partición, reensamblada
+    const numd=parseInt(tac,2), serd=parseInt(ser,2);
+    add('Serie en rango (1–16383)', serd>=1&&serd<=16383?'ok':'bad', 'S'+serd);
+    const def='0'+'1'.repeat(8)+'0'+'1'.repeat(9);
+    add('Posición', (pos===def||pos==='1'.repeat(19))?'ok':'ok', (pos===def||pos==='1'.repeat(19))?'por defecto':'coordenadas codificadas');
+  } else if(pc==='1001'){
+    const tipo=id60.slice(15,17), ident=id60.slice(17,41), pos=id60.slice(41,60);
+    rebuilt = id60[0]+id60.slice(1,11)+pc+tipo+ident+pos;
+    add('Tipo de identidad', '00 10 01'.includes(tipo)?'ok':'bad', tipo);
+  }
+  if(rebuilt!==null){ rtState = rebuilt===id60?'ok':'bad'; rtDetail = rebuilt===id60?'campos consistentes':'¡inconsistencia de bits!'; }
+  add('Reconstrucción de bits', rtState, rtDetail);
+
+  // BCH (solo trama de 30 hex)
+  if(raw.length===30){
+    const pdf1=bits.slice(0,61), b1emb=bits.slice(61,82), pdf2=bits.slice(82,108), b2emb=bits.slice(108,120);
+    const b1calc=bch1(pdf1), b2calc=bch2(pdf2);
+    add('BCH-1 (21 bits)', b1calc===b1emb?'ok':'bad', b1calc===b1emb?'correcto':'no coincide');
+    add('BCH-2 (12 bits)', b2calc===b2emb?'ok':'bad', b2calc===b2emb?'correcto':'no coincide');
+  } else {
+    add('BCH-1 / BCH-2', 'na', 'requiere trama completa de 30 hex');
+  }
+
+  const ok = checks.every(c=>c.state!=='bad');
+  return {ok, raw, id15:raw.slice(0,15), checks};
+}
+
+function renderVerify(){
+  const v=verifyCode($('verIn').value);
+  const st=$('verStatus'), out=$('verOut'); $('verErr').textContent='';
+  if(v.fatal){ st.innerHTML=''; out.innerHTML=''; $('verErr').textContent=v.fatal; return; }
+  st.innerHTML = `<span class="vbadge ${v.ok?'ok':'bad'}">${v.ok?'✓ VERIFICADO':'✗ REVISAR'}</span>`+
+    `<ul class="vchecks">`+v.checks.map(c=>{
+      const ic = c.state==='ok'?'✓':c.state==='bad'?'✕':'○';
+      return `<li><span class="ic ${c.state}">${ic}</span><span>${c.name}: <b>${c.detail}</b></span></li>`;
+    }).join('')+`</ul>`;
+
+  // desglose + ¿en registro?
   const o=decode15($('verIn').value);
-  const out=$('verOut'); $('verErr').textContent='';
-  if(o.error){ $('verErr').textContent=o.error; out.innerHTML=''; return; }
   const map=[['País (MID)',o.pais+(o.pais===725?' — Chile':'')],['Protocolo',o.protocolo]];
   if(o.tipo) map.push(['Tipo',o.tipo],[o.fuente,o.numero],['Serie',o.serie],['Posición',o.posicion]);
   if(o.tipoIdent) map.push(['Tipo de identidad',o.tipoIdent]);
-  // ¿coincide con algún registro?
-  const raw=$('verIn').value.replace(/[\s\-]/g,'').toUpperCase();
-  const hit=state.rows.find(r=>r.codigo_hex===raw.slice(0,15));
+  const hit=state.rows.find(r=>r.codigo_hex===v.id15);
   if(hit) map.push(['En registro','✔ '+(hit.matricula||'(sin matrícula)')]);
-  out.innerHTML=map.map(([k,v])=>`<dt style="color:var(--muted)">${k}</dt><dd style="margin:0;font-family:var(--mono)">${v}</dd>`).join('');
+  out.innerHTML=map.map(([k,val])=>`<dt style="color:var(--muted)">${k}</dt><dd style="margin:0;font-family:var(--mono)">${val}</dd>`).join('');
+}
+
+$('verGo').onclick=renderVerify;
+$('verIn').addEventListener('input',renderVerify);                 // verificación automática al escribir
+$('verIn').addEventListener('keydown',e=>{if(e.key==='Enter')renderVerify();});
+$('verExt').onclick=()=>{
+  const raw=($('verIn').value||'').replace(/[\s\-]/g,'').toUpperCase();
+  if(!/^[0-9A-F]{15}([0-9A-F]{15})?$/.test(raw)){ $('verErr').textContent='Ingresa un código de 15 o 30 caracteres hex antes de verificar.'; return; }
+  $('verErr').textContent='';
+  const open=()=>window.open('https://decoder2.herokuapp.com/decode','_blank','noopener');
+  if(navigator.clipboard){ navigator.clipboard.writeText(raw).then(()=>{toast('Código copiado · pégalo (Ctrl+V) y pulsa Process','ok');open();}).catch(open); }
+  else open();
 };
-$('verIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('verGo').click();});
 
 /* ---- settings ---- */
 $('openCfg').onclick=()=>{$('cfgUrl').value=state.cfg.url;$('cfgToken').value=state.cfg.token;$('cfgOverlay').classList.add('show');};
@@ -592,7 +677,7 @@ $('cfgSave').onclick=async()=>{
 };
 
 /* ---- init ---- */
-loadCfg(); loadLocal(); setConn(); renderReg(); renderNew();
+loadCfg(); loadLocal(); setConn(); renderReg(); suggestSerial();
 refresh(false);
 </script>
 </body>
